@@ -44,7 +44,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function user(){
-        $this->hasMany(Category::class);
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_users', 'user_id', 'category_id');
+    }
+
+    public function isSuperUser()
+    {
+        
+        return $this->name === 'superadmin';
     }
 }
