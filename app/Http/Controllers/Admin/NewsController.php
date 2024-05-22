@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class NewsController extends Controller
@@ -16,12 +17,35 @@ class NewsController extends Controller
     public function __construct()
     {
         $this->middleware('admin');
-
     }
     public function index()
     {
-        $newes = News::get();
+        $user = Auth::user();
+
+        if ($user->isSuperUser()) {
+            $newes = News::all();
+        } else {
+            $categoryIds = $user->categories->pluck('id');
+            $newes = News::whereIn('category_id', $categoryIds)->get();
+            // dd($news);
+        }
+        // $newes = News::get();
         return view('admin.news.index', compact('newes'));
+    }
+
+
+    public function getCategory()
+    {
+        $user = Auth::user();
+        if ($user->isSuperUser()) {
+            $categories = Category::get();
+        } else {
+            $categoryIds = $user->categories->pluck('id');
+            $categories = Category::whereIn('id', $categoryIds)->get();
+            // dd($categories);
+            // dd($news);
+        }
+        return $categories;
     }
 
     /**
@@ -29,7 +53,9 @@ class NewsController extends Controller
      */
     public function create()
     {
-        $categories = Category::get();
+        $user = Auth::user();
+
+        $categories = $this->getCategory();
 
         return view('admin.news.create', compact('categories'));
     }
@@ -87,7 +113,8 @@ class NewsController extends Controller
     public function edit(News $news)
     {
         // dd($news);
-        $categories = Category::get();
+        $categories = $this->getCategory();
+
         return view('admin.news.edit', compact('news', 'categories'));
     }
 

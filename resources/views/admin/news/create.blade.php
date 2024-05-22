@@ -37,9 +37,12 @@
                 {{-- @dd($categories) --}}
                 <select name="category_id" class="w-full border py-2 mt-1 text-black outline-none px-3 rounded-md">
 
+                    @if (Auth::user()->isSuperUser())
+                        <option disabled value="" selected>Choose Category
+                        </option>
+                    @endif
                     @foreach ($categories as $category)
-                        <option disabled selected>adad</option>
-                        <option class="text-black" value="{{$category->id}}">{{ $category->name }}</option>
+                        <option class="text-black" value="{{ $category->id }}">{{ $category->name }}</option>
                     @endforeach
                 </select>
 
